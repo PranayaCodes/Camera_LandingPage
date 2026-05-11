@@ -7,11 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prepare:images": "node scripts/prepare-images.mjs"
+    "prepare:images": "node scripts/prepare-images.mjs",
+    "test:order": "node scripts/test-order.mjs"
   },
   "dependencies": {
     "@types/nodemailer": "^6.4.17",
     "clsx": "^2.1.1",
+    "dotenv": "^17.4.2",
     "googleapis": "^144.0.0",
     "lucide-react": "^0.468.0",
     "next": "^16.2.6",

@@ -52,6 +52,8 @@ EMAIL_SERVICE_API_KEY=
 FRONTEND_URL=http://localhost:3000
 ```
 
+You can also copy `.env.local.example` because it already includes the provided Google Sheet ID and service account email. Paste the private key and Gmail app password locally only. Do not commit `.env.local`.
+
 For Vercel, add the same values in Project Settings > Environment Variables. Set `NEXT_PUBLIC_SITE_URL` and `FRONTEND_URL` to your production domain, for example `https://your-domain.com`.
 
 ## Google Spreadsheet Setup
@@ -117,6 +119,22 @@ EMAIL_FROM="Brand Name <your-gmail@gmail.com>"
 ```
 
 The business email receives the full order details. The customer receives a polished "Order Received" email.
+
+## Test the Full Order Pipeline
+
+After `.env.local` has the Google private key and Gmail app password, start the app:
+
+```bash
+npm run dev
+```
+
+In another terminal, run:
+
+```bash
+npm run test:order
+```
+
+If everything is configured correctly, the script returns a success response with an Order ID, adds a row to Google Sheets, sends the business notification email, and sends the customer confirmation email.
 
 ## Testing Order Submission
 
