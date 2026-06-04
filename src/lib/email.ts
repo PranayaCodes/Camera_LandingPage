@@ -1,13 +1,6 @@
 import nodemailer from "nodemailer";
 import type { OrderRecord } from "./order";
 
-function requireEnv(name: string) {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`${name} is not configured`);
-  }
-  return value;
-}
 
 function money(amount: number) {
   return `Rs. ${Number(amount).toLocaleString("en-IN")}`;
@@ -81,16 +74,25 @@ export function customerEmail(order: OrderRecord, brandName: string, replyTo: st
 
 export async function sendOrderEmails(order: OrderRecord) {
   const brandName = process.env.BRAND_NAME || "ProCapture Nepal";
-  const from = requireEnv("EMAIL_FROM");
-  const businessEmailAddress = requireEnv("BUSINESS_EMAIL");
+  const from = process.env.EMAIL_FROM;
+  const businessEmailAddress = process.env.BUSINESS_EMAIL;
+  const smtpHost = process.env.SMTP_HOST;
+  const smtpPort = process.env.SMTP_PORT;
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+
+  if (!from || !businessEmailAddress || !smtpHost || !smtpPort || !smtpUser || !smtpPass) {
+    console.warn("Email integration is not fully configured (missing required SMTP env variables). Skipping order emails.");
+    return;
+  }
 
   const transporter = nodemailer.createTransport({
-    host: requireEnv("SMTP_HOST"),
-    port: Number(requireEnv("SMTP_PORT")),
-    secure: Number(process.env.SMTP_PORT) === 465,
+    host: smtpHost,
+    port: Number(smtpPort),
+    secure: Number(smtpPort) === 465,
     auth: {
-      user: requireEnv("SMTP_USER"),
-      pass: requireEnv("SMTP_PASS")
+      user: smtpUser,
+      pass: smtpPass
     }
   });
 

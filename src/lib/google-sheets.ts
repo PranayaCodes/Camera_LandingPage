@@ -17,25 +17,22 @@ const columns = [
   "Notes"
 ];
 
-function requireEnv(name: string) {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`${name} is not configured`);
-  }
-  return value;
-}
-
-function privateKey() {
-  return requireEnv("GOOGLE_PRIVATE_KEY").replace(/\\n/g, "\n");
-}
-
 export async function appendOrderToSheet(order: OrderRecord) {
-  const sheetId = requireEnv("GOOGLE_SHEET_ID");
+  const sheetId = process.env.GOOGLE_SHEET_ID;
+  const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+  const privateKeyRaw = process.env.GOOGLE_PRIVATE_KEY;
+
+  if (!sheetId || !serviceAccountEmail || !privateKeyRaw) {
+    console.warn("Google Sheets integration is not fully configured (missing GOOGLE_SHEET_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL, or GOOGLE_PRIVATE_KEY). Skipping sheet append.");
+    return;
+  }
+
   const tabName = process.env.GOOGLE_SHEET_TAB_NAME || "Orders";
+  const privateKey = privateKeyRaw.replace(/\\n/g, "\n");
 
   const auth = new google.auth.JWT({
-    email: requireEnv("GOOGLE_SERVICE_ACCOUNT_EMAIL"),
-    key: privateKey(),
+    email: serviceAccountEmail,
+    key: privateKey,
     scopes: ["https://www.googleapis.com/auth/spreadsheets"]
   });
 
