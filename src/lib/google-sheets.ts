@@ -41,6 +41,8 @@ export async function appendOrderToSheet(order: OrderRecord) {
 
   const sheets = google.sheets({ version: "v4", auth });
 
+  await ensureSheetTab(sheets, sheetId, tabName);
+
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
     range: `${tabName}!A1:M1`,
@@ -70,6 +72,37 @@ export async function appendOrderToSheet(order: OrderRecord) {
           order.orderStatus,
           order.notes
         ]
+      ]
+    }
+  });
+}
+
+async function ensureSheetTab(
+  sheets: ReturnType<typeof google.sheets>,
+  spreadsheetId: string,
+  tabName: string
+) {
+  const spreadsheet = await sheets.spreadsheets.get({
+    spreadsheetId,
+    fields: "sheets.properties.title"
+  });
+
+  const exists = spreadsheet.data.sheets?.some((sheet) => sheet.properties?.title === tabName);
+  if (exists) {
+    return;
+  }
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      requests: [
+        {
+          addSheet: {
+            properties: {
+              title: tabName
+            }
+          }
+        }
       ]
     }
   });

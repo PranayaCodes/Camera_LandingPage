@@ -3,7 +3,7 @@ import "dotenv/config";
 const order = {
   customerName: "Test Customer",
   phone: "9800000000",
-  email: "customer@example.com",
+  email: process.env.TEST_CUSTOMER_EMAIL || process.env.BUSINESS_EMAIL || "customer@example.com",
   location: "Kathmandu, Nepal",
   productName: "ProCapture 4K Action Camera",
   quantity: 1,
